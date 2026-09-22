@@ -1,4 +1,4 @@
 package com.zouhir.neobank.security;
 
-public class JwtAuthenticationFilter {
+public class JwtAuthenticationFilter  {
 }
