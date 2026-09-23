@@ -5,6 +5,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class User implements UserDetails {

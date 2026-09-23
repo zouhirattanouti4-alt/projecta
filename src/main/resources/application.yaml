@@ -20,3 +20,8 @@ spring:
     baseline-on-migrate: true
     baseline-description: 'init'
     baseline-version: 1
+
+application:
+  security:
+    jwt:
+      secret-key: 7922255b70a1e19c2542cb91542333978f680542ee2d8cb7cd96ee08fe5f54cd
