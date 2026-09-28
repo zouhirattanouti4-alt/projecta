@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +21,7 @@ import java.util.UUID;
 // @Setter : removing setters for sensible data like : password, created/updated_at.. to avoid editing
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "users")
+@Table(name = "users") // user is a reserved table by postgresql
 public class User implements UserDetails {
 
     @Id
@@ -45,10 +45,10 @@ public class User implements UserDetails {
     private Role role = Role.User;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Override
     @Nonnull
@@ -89,24 +89,23 @@ public class User implements UserDetails {
 
     @PrePersist
     protected void onCreate(){
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
     @PreUpdate
     protected void onUpdate(){
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 
     @Override
     public boolean equals(Object other){
         if(this == other) return true;
-        if(!(other instanceof User)) return false;
-        User user = (User) other;
+        if(!(other instanceof User user)) return false;
         return Objects.equals(this.getEmail(), user.getEmail());
     }
 
     @Override
     public int hashCode(){
-        return Objects.hash(email);
+        return Objects.hash(getEmail());
     }
 }
