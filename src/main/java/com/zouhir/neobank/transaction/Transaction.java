@@ -7,6 +7,7 @@ import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -50,4 +51,15 @@ public class Transaction {
         this.createdAt = Instant.now();
     }
 
+    @Override
+    public boolean equals(Object other){
+        if(this == other) return true;
+        if(!(other instanceof Transaction transaction)) return false;
+        return this.getReference().equals(.getReference());
+    }
+
+    @Override
+    public int hashCode(){
+        return Objects.hash(getReference());
+    }
 }
