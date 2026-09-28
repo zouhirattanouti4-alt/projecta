@@ -19,3 +19,14 @@ CREATE TABLE accounts(
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );
+
+CREATE TABLE transactions(
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    from_account_id UUID REFERENCES users(id),
+    to_account_id UUID REFERENCES users(id),
+    amount NUMERIC(19,4) NOT NULL CHECK ( amount > 0 ),
+    type VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    reference VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL
+);
