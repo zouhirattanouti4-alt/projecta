@@ -2,19 +2,20 @@ package com.zouhir.neobank.transaction;
 
 import com.zouhir.neobank.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "transactions")
 @Builder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Immutable
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,5 +33,21 @@ public class Transaction {
     @Column(precision = 19, scale = 4, nullable = false)
     private BigDecimal amount;
 
+    @Column(nullable = false)
+    private Type type;
+
+    @Column(nullable = false)
+    private Status status;
+
+    @Column(nullable = false, updatable = false, unique = false)
+    private String reference;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @PrePersist
+    public void onCreate(){
+        this.createdAt = Instant.now();
+    }
 
 }
