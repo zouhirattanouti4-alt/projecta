@@ -1,5 +1,6 @@
 package com.zouhir.neobank.transaction;
 
+import com.zouhir.neobank.account.Account;
 import com.zouhir.neobank.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,22 +26,24 @@ public class Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_account_id")
-    private User fromAccountUser;
+    private Account fromAccount; // we use Account and not User, a user may have lots of accs
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_account_id")
-    private User toAccountUser;
+    private Account toAccount;
 
     @Column(precision = 19, scale = 4, nullable = false)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
-    @Column(nullable = false, updatable = false, unique = false)
+    @Column(nullable = false, updatable = false, unique = true)
     private String reference;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -55,7 +58,7 @@ public class Transaction {
     public boolean equals(Object other){
         if(this == other) return true;
         if(!(other instanceof Transaction transaction)) return false;
-        return this.getReference().equals(.getReference());
+        return Objects.equals(this.getReference(),transaction.getReference());
     }
 
     @Override
