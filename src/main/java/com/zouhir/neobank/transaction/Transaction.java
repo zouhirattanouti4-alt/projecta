@@ -15,7 +15,6 @@ import java.util.UUID;
 @Table(name = "transactions")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Immutable
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,22 +22,22 @@ public class Transaction {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_account_id")
+    @JoinColumn(name = "from_account_id", updatable = false) // can be null if it's physical deposit
     private Account fromAccount; // we use Account and not User, a user may have lots of accs
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_account_id")
+    @JoinColumn(name = "to_account_id", updatable = false)
     private Account toAccount;
 
-    @Column(precision = 19, scale = 4, nullable = false)
+    @Column(precision = 19, scale = 4, nullable = false, updatable = false)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Type type;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false) // No updatable = false , because we can move from a status to another
     private Status status;
 
     @Column(nullable = false, updatable = false, unique = true)
@@ -51,6 +50,8 @@ public class Transaction {
     public Transaction(UUID id, Account fromAccount, Account toAccount, BigDecimal amount, Type type, Status status, String reference, Instant createdAt){
         if(amount==null || amount.compareTo(BigDecimal.ZERO) <= 0) // Satisfying the Check (amount > 0) constraint
             throw new IllegalArgumentException("Error : The amount should be positive");
+        if(fromAccount==null && toAccount==null) // because the fields are not marked with nullable = false
+            throw new IllegalArgumentException("Error : At least one account is required");
         this.id = id;
         this.fromAccount = fromAccount;
         this.toAccount = toAccount;
@@ -61,6 +62,16 @@ public class Transaction {
         this.createdAt = (createdAt!=null) ? createdAt : Instant.now();
     }
 
+    public void markAsCompleted(){
+        if(this.status == Status.PENDING || this.status == Status.TO_VERIFY)
+            this.status = Status.COMPLETED;
+        else throw new IllegalStateException("Error : Prohibited status transition");
+    }
+    public void markAsFailed(){
+        if(this.status == Status.PENDING || this.status == Status.TO_VERIFY)
+            this.status = Status.FAILED;
+        else throw new IllegalStateException("Error : Prohibited status transition");
+    }
 
     @Override
     public boolean equals(Object other){
