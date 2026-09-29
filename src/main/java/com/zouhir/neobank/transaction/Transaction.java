@@ -63,14 +63,20 @@ public class Transaction {
     }
 
     public void markAsCompleted(){
-        if(this.status == Status.PENDING || this.status == Status.TO_VERIFY)
+        if(this.status == Status.PENDING || this.status == Status.TO_VERIFY) {
             this.status = Status.COMPLETED;
-        else throw new IllegalStateException("Error : Prohibited status transition");
+        }
+        else {
+            throw new IllegalStateException("Error : Prohibited status transition");
+        }
     }
     public void markAsFailed(){
-        if(this.status == Status.PENDING || this.status == Status.TO_VERIFY)
+        if(this.status == Status.PENDING || this.status == Status.TO_VERIFY) {
             this.status = Status.FAILED;
-        else throw new IllegalStateException("Error : Prohibited status transition");
+        }
+        else {
+            throw new IllegalStateException("Error : Prohibited status transition");
+        }
     }
 
     @Override
