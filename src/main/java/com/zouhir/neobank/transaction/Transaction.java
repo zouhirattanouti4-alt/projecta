@@ -13,9 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "transactions")
-@Builder
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Immutable
 public class Transaction {
@@ -49,10 +47,20 @@ public class Transaction {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @PrePersist
-    public void onCreate(){
-        this.createdAt = Instant.now();
+    @Builder
+    public Transaction(UUID id, Account fromAccount, Account toAccount, BigDecimal amount, Type type, Status status, String reference, Instant createdAt){
+        if(amount==null || amount.compareTo(BigDecimal.ZERO) <= 0) // Satisfying the Check (amount > 0) constraint
+            throw new IllegalArgumentException("Error : The amount should be positive");
+        this.id = id;
+        this.fromAccount = fromAccount;
+        this.toAccount = toAccount;
+        this.amount = amount;
+        this.type = type;
+        this.status = status;
+        this.reference = reference;
+        this.createdAt = (createdAt!=null) ? createdAt : Instant.now();
     }
+
 
     @Override
     public boolean equals(Object other){
