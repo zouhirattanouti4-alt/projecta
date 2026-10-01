@@ -1,6 +1,5 @@
 package com.zouhir.neobank.account;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.zouhir.neobank.common.exceptions.InsufficientBalanceException;
 import com.zouhir.neobank.user.User;
 import jakarta.persistence.*;
@@ -8,7 +7,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
