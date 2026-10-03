@@ -5,6 +5,10 @@ import com.zouhir.neobank.account.AccountRepository;
 import com.zouhir.neobank.common.exceptions.AccountNotFoundException;
 import com.zouhir.neobank.transaction.dto.TransactionDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,5 +43,26 @@ public class TransactionService {
         transactionRepository.save(transaction);
 
         return TransactionDto.builder().id(transaction.getId()).fromAccountId(fromAccountId).toAccountId(toAccountId).amount(amount).build();
+    }
+
+    public boolean verifyAccountOwnership(UUID id, UUID userId){
+        return accountRepository.existsByIdAndUserId(id,userId);
+    }
+
+    public Page<TransactionDto> history(UUID id, Pageable pageable){
+        Pageable pageRequest = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending());
+
+        Page<Transaction> page = transactionRepository.findByFromAccount_IdOrToAccount_Id(id, id, pageRequest);
+
+        return page.map(tx -> TransactionDto.builder()
+                .id(tx.getId())
+                .fromAccountId(tx.getFromAccount() != null ? tx.getFromAccount().getId() : null)
+                .toAccountId(tx.getToAccount() != null ? tx.getToAccount().getId() : null)
+                .amount(tx.getAmount())
+                .build()
+        );
     }
 }
