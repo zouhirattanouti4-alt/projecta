@@ -1,4 +1,13 @@
 package com.zouhir.neobank.user.dto;
 
-public class UserDto {
+import lombok.Builder;
+
+import java.util.UUID;
+
+@Builder
+public record UserDto (
+        UUID id,
+        String email,
+        String fullName
+){
 }

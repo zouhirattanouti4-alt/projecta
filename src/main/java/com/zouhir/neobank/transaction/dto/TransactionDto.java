@@ -12,15 +12,13 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
-@AllArgsConstructor
-@Getter
-public class TransactionDto {
-    private UUID id;
+public record TransactionDto (
+     UUID id,
 
-    private UUID fromAccountId;
+     UUID fromAccountId,
 
-    private UUID toAccountId;
+     UUID toAccountId,
 
-    private BigDecimal amount;
-
-}
+     BigDecimal amount
+)
+{}

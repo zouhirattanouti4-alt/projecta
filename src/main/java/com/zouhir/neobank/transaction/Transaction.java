@@ -1,10 +1,8 @@
 package com.zouhir.neobank.transaction;
 
 import com.zouhir.neobank.account.Account;
-import com.zouhir.neobank.user.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.time.Instant;

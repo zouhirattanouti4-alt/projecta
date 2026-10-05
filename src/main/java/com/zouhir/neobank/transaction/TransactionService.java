@@ -5,10 +5,13 @@ import com.zouhir.neobank.account.AccountRepository;
 import com.zouhir.neobank.common.exceptions.AccountNotFoundException;
 import com.zouhir.neobank.transaction.dto.TransactionDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,12 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
 
     @Transactional
+    @Retryable(
+            retryFor = OptimisticLockingFailureException.class,
+            maxAttempts = 3,                                              // Tente l'opération 3 fois max au total
+            backoff = @Backoff(delay = 100, maxDelay = 300, multiplier = 1.5) // Attend un délai progressif
+
+    )
     public TransactionDto transfer(UUID fromAccountId, UUID toAccountId, BigDecimal amount, String reference){
         Account sourceAccount = accountRepository.findById(fromAccountId)
                 .orElseThrow(() -> new AccountNotFoundException("Error : The source account does not exist"));
@@ -45,9 +54,6 @@ public class TransactionService {
         return TransactionDto.builder().id(transaction.getId()).fromAccountId(fromAccountId).toAccountId(toAccountId).amount(amount).build();
     }
 
-    public boolean verifyAccountOwnership(UUID id, UUID userId){
-        return accountRepository.existsByIdAndUserId(id,userId);
-    }
 
     public Page<TransactionDto> history(UUID id, Pageable pageable){
         Pageable pageRequest = PageRequest.of(

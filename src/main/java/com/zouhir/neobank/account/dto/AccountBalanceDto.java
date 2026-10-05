@@ -1,14 +1,13 @@
 package com.zouhir.neobank.account.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Builder
-public record AccountDto(
-        UUID id,
-        String accountNo,
+public record AccountBalanceDto(
+        @NotNull
         BigDecimal balance
 ) {
 }

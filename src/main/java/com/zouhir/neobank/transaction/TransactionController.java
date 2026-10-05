@@ -1,8 +1,10 @@
 package com.zouhir.neobank.transaction;
 
+import com.zouhir.neobank.account.AccountService;
 import com.zouhir.neobank.transaction.dto.TransactionDto;
 import com.zouhir.neobank.transaction.dto.TransactionRequestDto;
 import com.zouhir.neobank.user.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,15 +21,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
+    private final AccountService accountService;
 
     @PostMapping("transfer")
     public ResponseEntity<TransactionDto> transfer(
-            @RequestBody TransactionRequestDto request,
+            @Valid @RequestBody TransactionRequestDto request,
             @AuthenticationPrincipal User authenticatedUser
             )
     {
-        boolean isOwner = transactionService.verifyAccountOwnership(request.fromAccountId(),authenticatedUser.getId());
-        if(!isOwner) throw new AccessDeniedException("You are not autorized for this transaction");
+        boolean isOwner = accountService.verifyAccountOwnership(request.fromAccountId(),authenticatedUser.getId());
+        if(!isOwner) throw new AccessDeniedException("You are not authorized for this transaction");
 
         TransactionDto transaction = transactionService.transfer(
                 request.fromAccountId(),
@@ -46,7 +49,7 @@ public class TransactionController {
             Pageable pageable
             )
     {
-        boolean isOwner = transactionService.verifyAccountOwnership(id, authenticatedUser.getId());
+        boolean isOwner = accountService.verifyAccountOwnership(id, authenticatedUser.getId());
         if(!isOwner) throw new AccessDeniedException("You are not autorized for this transaction");
 
         Page<TransactionDto> transactions = transactionService.history(id, pageable);
