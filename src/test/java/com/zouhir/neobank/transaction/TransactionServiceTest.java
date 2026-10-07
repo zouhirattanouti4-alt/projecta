@@ -77,4 +77,21 @@ class TransactionServiceTest {
         assertEquals(amountToTransfer, capturedTransaction.getAmount());
     }
 
+    @Test
+    @DisplayName("should throw exception when balance insufficient")
+    public void should_throw_exception_when_balance_insufficient(){
+        //Given
+        BigDecimal amountToTransfer = new BigDecimal("1500");
+
+        given(accountRepository.findById(sourceId)).willReturn(Optional.of(sourceAccount));
+        given(accountRepository.findById(destId)).willReturn(Optional.of(destAccount));
+
+
+        //When and Then
+        assertThrows(InsufficientBalanceException.class,
+                () ->transactionService.transfer(sourceId, destId, amountToTransfer, "reference_123"));
+
+        then(accountRepository).should(never()).save(any(Account.class));
+    }
+
 }
