@@ -1,7 +1,6 @@
-package com.zouhir.neobank.auth;
+package com.zouhir.neobank.auth.Dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder

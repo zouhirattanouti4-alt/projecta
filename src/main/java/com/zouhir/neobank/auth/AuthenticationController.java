@@ -1,5 +1,8 @@
 package com.zouhir.neobank.auth;
 
+import com.zouhir.neobank.auth.Dto.AuthenticationResponseDto;
+import com.zouhir.neobank.auth.Dto.LoginRequestDto;
+import com.zouhir.neobank.auth.Dto.RegisterRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

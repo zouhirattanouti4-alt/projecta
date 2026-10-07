@@ -1,5 +1,8 @@
 package com.zouhir.neobank.auth;
 
+import com.zouhir.neobank.auth.Dto.AuthenticationResponseDto;
+import com.zouhir.neobank.auth.Dto.LoginRequestDto;
+import com.zouhir.neobank.auth.Dto.RegisterRequestDto;
 import com.zouhir.neobank.common.exceptions.EmailAlreadyExistsException;
 import com.zouhir.neobank.security.JwtService;
 import com.zouhir.neobank.user.User;
