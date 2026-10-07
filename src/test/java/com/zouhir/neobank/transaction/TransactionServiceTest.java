@@ -52,4 +52,29 @@ class TransactionServiceTest {
         destAccount = Account.builder().id(destId).balance(destBalance).build();
     }
 
+    @Test
+    @DisplayName("should transfer successfully when funds are sufficient")
+    public void should_transfer_successfully_when_funds_are_sufficient(){
+        //Given
+        BigDecimal amountToTransfer = new BigDecimal("100");
+
+        given(accountRepository.findById(sourceId)).willReturn(Optional.of(sourceAccount));
+        given(accountRepository.findById(destId)).willReturn(Optional.of(destAccount));
+
+        //When
+        transactionService.transfer(sourceId, destId, amountToTransfer, "reference_123");
+
+        //Then
+        assertEquals(new BigDecimal("900"), sourceAccount.getBalance());
+        assertEquals(new BigDecimal("100"), destAccount.getBalance());
+
+        then(accountRepository).should(times(2)).save(any(Account.class));
+
+        then(transactionRepository).should(times(1)).save(transactionCaptor.capture());
+
+        Transaction capturedTransaction = transactionCaptor.getValue();
+
+        assertEquals(amountToTransfer, capturedTransaction.getAmount());
+    }
+
 }
