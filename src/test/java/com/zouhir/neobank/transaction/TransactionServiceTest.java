@@ -94,4 +94,14 @@ class TransactionServiceTest {
         then(accountRepository).should(never()).save(any(Account.class));
     }
 
+    @Test
+    @DisplayName("should throw exception when account not found")
+    public void should_throw_exception_when_account_not_found(){
+        //Given
+        given(accountRepository.findById(sourceId)).willReturn(Optional.empty());
+        BigDecimal amountToTransfer = new BigDecimal("100");
+        //Then
+        assertThrows(AccountNotFoundException.class,
+                () -> transactionService.transfer(sourceId, destId, amountToTransfer, "ref_123"));
+    }
 }
