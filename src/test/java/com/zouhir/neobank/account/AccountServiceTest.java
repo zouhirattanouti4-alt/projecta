@@ -1,5 +1,6 @@
 package com.zouhir.neobank.account;
 
+import com.zouhir.neobank.common.exceptions.AccountNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,16 +28,16 @@ class AccountServiceTest {
     private UUID id;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         id = UUID.randomUUID();
     }
 
     @Test
     @DisplayName("should return true when user owns account")
-    public void should_return_true_when_user_owns_account(){
+    public void should_return_true_when_user_owns_account() {
         //GIVEN
         UUID userId = UUID.randomUUID();
-        given(accountRepository.existsByIdAndUser_Id(id,userId))
+        given(accountRepository.existsByIdAndUser_Id(id, userId))
                 .willReturn(true);
 
         //WHEN and THEN
@@ -45,10 +46,10 @@ class AccountServiceTest {
 
     @Test
     @DisplayName("should return false when user does not own account")
-    public void should_return_false_when_user_does_not_own_account(){
+    public void should_return_false_when_user_does_not_own_account() {
         //GIVEN
         UUID userId = UUID.randomUUID();
-        given(accountRepository.existsByIdAndUser_Id(id,userId))
+        given(accountRepository.existsByIdAndUser_Id(id, userId))
                 .willReturn(false);
 
         //WHEN and THEN
@@ -57,7 +58,7 @@ class AccountServiceTest {
 
     @Test
     @DisplayName("should return balance")
-    public void should_return_balance(){
+    public void should_return_balance() {
         //GIVEN
         Account account = Account
                 .builder()
@@ -71,5 +72,14 @@ class AccountServiceTest {
         assertEquals(new BigDecimal("100"), accountService.balance(id).balance());
     }
 
+    @Test
+    @DisplayName("should throw exception when account not found for balance")
+    public void should_throw_exception_when_account_not_found_for_balance() {
+        //GIVEN
+        given(accountRepository.findById(id)).willReturn(Optional.empty());
 
+        //WHEN and THEN
+        assertThrows(AccountNotFoundException.class,
+                () -> accountService.balance(id));
+    }
 }
