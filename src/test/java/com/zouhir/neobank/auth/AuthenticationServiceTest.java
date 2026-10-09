@@ -75,4 +75,25 @@ class AuthenticationServiceTest {
         assertEquals("fake_jwt_token", response.jwt());
     }
 
+    @Test
+    @DisplayName("should throw exception when email already existed")
+    public void  should_throw_exception_when_email_already_existed(){
+        //GIVEN
+        RegisterRequestDto registerRequest = RegisterRequestDto
+                .builder()
+                .email("email@example.com")
+                .password("psw_123")
+                .fullName("Zouhir ATTANOUTI")
+                .build();
+
+
+        given(userRepository.existsByEmail("email@example.com"))
+                .willReturn(true);
+
+        //WHEN and THEN
+        assertThrows(EmailAlreadyExistsException.class,
+                () -> authenticationService.register(registerRequest));
+        then(userRepository).should(never()).save(any(User.class));
+    }
+
 }
