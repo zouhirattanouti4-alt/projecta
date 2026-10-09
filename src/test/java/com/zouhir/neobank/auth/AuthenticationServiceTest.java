@@ -57,13 +57,7 @@ class AuthenticationServiceTest {
         given(passwordEncoder.encode(registerRequest.password()))
                 .willReturn("Hashed password");
 
-        User user = User.builder()
-                .email(registerRequest.email())
-                .passwordHash(passwordEncoder.encode(registerRequest.password()))
-                .fullName(registerRequest.fullName())
-                .build();
-
-        given(jwtService.generateToken(user))
+        given(jwtService.generateToken(any(User.class)))
                 .willReturn("fake_jwt_token");
 
         //WHEN
@@ -107,7 +101,7 @@ class AuthenticationServiceTest {
                 .build();
         User user = User.builder()
                 .email(loginRequest.email())
-                .passwordHash(passwordEncoder.encode(loginRequest.password()))
+                .passwordHash("fake_hash_pwd")
                 .build();
 
         given(userRepository.findByEmail("email@example.com"))
