@@ -55,6 +55,21 @@ class AccountServiceTest {
         assertFalse(accountService.verifyAccountOwnership(id, userId));
     }
 
+    @Test
+    @DisplayName("should return balance")
+    public void should_return_balance(){
+        //GIVEN
+        Account account = Account
+                .builder()
+                .id(id)
+                .balance(new BigDecimal("100"))
+                .build();
+
+        given(accountRepository.findById(id)).willReturn(Optional.of(account));
+
+        //WHEN and THEN
+        assertEquals(new BigDecimal("100"), accountService.balance(id).balance());
+    }
 
 
 }
