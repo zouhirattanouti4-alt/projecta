@@ -43,6 +43,18 @@ class AccountServiceTest {
         assertTrue(accountService.verifyAccountOwnership(id, userId));
     }
 
+    @Test
+    @DisplayName("should return false when user does not own account")
+    public void should_return_false_when_user_does_not_own_account(){
+        //GIVEN
+        UUID userId = UUID.randomUUID();
+        given(accountRepository.existsByIdAndUser_Id(id,userId))
+                .willReturn(false);
+
+        //WHEN and THEN
+        assertFalse(accountService.verifyAccountOwnership(id, userId));
+    }
+
 
 
 }
