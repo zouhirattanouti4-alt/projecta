@@ -123,4 +123,21 @@ class AuthenticationServiceTest {
         assertEquals("fake_jwt_token", response.jwt());
     }
 
+    @Test
+    @DisplayName("should throw exception when user not found during login")
+    public void should_throw_exception_when_user_not_found_during_login(){
+        //GIVEN
+        LoginRequestDto loginRequest = LoginRequestDto
+                .builder()
+                .email("email@example.com")
+                .password("pwd_123")
+                .build();
+        given(userRepository.findByEmail("email@example.com"))
+                .willReturn(Optional.empty());
+
+
+        //WHEN and THEN
+        assertThrows(UsernameNotFoundException.class,
+                () -> authenticationService.login(loginRequest));
+    }
 }
