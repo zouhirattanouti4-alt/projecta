@@ -23,15 +23,17 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponseDto register(RegisterRequestDto request){
+        if(userRepository.existsByEmail(request.email())){
+            throw new EmailAlreadyExistsException("Email Already Exists");
+        }
+
+
         var user = User.builder()
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .fullName(request.fullName())
                 .build();
 
-        if(userRepository.existsByEmail(request.email())){
-            throw new EmailAlreadyExistsException("Email Already Exists");
-        }
 
         userRepository.save(user);
 

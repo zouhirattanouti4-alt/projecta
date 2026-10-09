@@ -100,8 +100,11 @@ class TransactionServiceTest {
         //Given
         given(accountRepository.findById(sourceId)).willReturn(Optional.empty());
         BigDecimal amountToTransfer = new BigDecimal("100");
-        //Then
+        //When and Then
         assertThrows(AccountNotFoundException.class,
-                () -> transactionService.transfer(sourceId, destId, amountToTransfer, "ref_123"));
+                () -> transactionService.transfer(sourceId, destId, amountToTransfer, "reference_123"));
+
+        then(accountRepository).should(never()).save(any(Account.class));
+        then(transactionRepository).should(never()).save(any(Transaction.class));
     }
 }
