@@ -96,4 +96,31 @@ class AuthenticationServiceTest {
         then(userRepository).should(never()).save(any(User.class));
     }
 
+    @Test
+    @DisplayName("should login successfully when credentials are valid")
+    public void should_login_successfully_when_credentials_are_valid(){
+        //GIVEN
+        LoginRequestDto loginRequest = LoginRequestDto
+                .builder()
+                .email("email@example.com")
+                .password("pwd_123")
+                .build();
+        User user = User.builder()
+                .email(loginRequest.email())
+                .passwordHash(passwordEncoder.encode(loginRequest.password()))
+                .build();
+
+        given(userRepository.findByEmail("email@example.com"))
+                .willReturn(Optional.of(user));
+
+        given(jwtService.generateToken(user))
+                .willReturn("fake_jwt_token");
+
+        //WHEN
+        AuthenticationResponseDto response = authenticationService.login(loginRequest);
+
+        //THEN
+        assertEquals("fake_jwt_token", response.jwt());
+    }
+
 }
