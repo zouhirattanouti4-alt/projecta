@@ -115,6 +115,35 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.jwt").value("fake_jwt_token"));
     }
 
+    @Test
+    @DisplayName("should reject registering user and return 400 BAD REQUEST when given email is not valid")
+    public void should_reject_registering_when_email_is_not_valid() throws Exception{
+        //GIVEN
+        RegisterRequestDto request = RegisterRequestDto
+                .builder()
+                .email(null)
+                .password("psw")
+                .fullName("Zouhir")
+                .build();
+
+
+        given(userRepository.existsByEmail(any()))
+                .willReturn(false);
+        given(jwtService.generateToken(principal))
+                .willReturn("fake_jwt_token");
+
+        String jsonRequest = jsonMapper.writeValueAsString(request);
+
+        //WHEN and THEN
+        mockMvc.perform(post("/api/v1/auth/register")
+                .with(authentication(auth))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequest)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 
 
 }
