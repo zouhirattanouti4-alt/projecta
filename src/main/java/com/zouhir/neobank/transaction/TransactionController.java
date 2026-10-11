@@ -1,6 +1,7 @@
 package com.zouhir.neobank.transaction;
 
 import com.zouhir.neobank.account.AccountService;
+import com.zouhir.neobank.common.exceptions.AccountOwnershipNotProvedException;
 import com.zouhir.neobank.transaction.dto.TransactionDto;
 import com.zouhir.neobank.transaction.dto.TransactionRequestDto;
 import com.zouhir.neobank.user.User;
@@ -30,7 +31,7 @@ public class TransactionController {
             )
     {
         boolean isOwner = accountService.verifyAccountOwnership(request.fromAccountId(),authenticatedUser.getId());
-        if(!isOwner) throw new AccessDeniedException("You are not authorized for this transaction");
+        if(!isOwner) throw new AccountOwnershipNotProvedException("You dont have the account ownership");
 
         TransactionDto transaction = transactionService.transfer(
                 request.fromAccountId(),
@@ -50,7 +51,7 @@ public class TransactionController {
             )
     {
         boolean isOwner = accountService.verifyAccountOwnership(id, authenticatedUser.getId());
-        if(!isOwner) throw new AccessDeniedException("You are not autorized for this transaction");
+        if(!isOwner) throw new AccountOwnershipNotProvedException("You dont have the account ownership");
 
         Page<TransactionDto> transactions = transactionService.history(id, pageable);
         return new ResponseEntity<>(transactions, HttpStatus.OK);

@@ -69,6 +69,18 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(AccountOwnershipNotProvedException.class)
+    public ProblemDetail handleAccountOwnershipNotProvedException(AccountOwnershipNotProvedException ex){
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Account Ownership Not Proved");
+
+        return problemDetail;
+    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleMethodArgumentNotValidException(MethodArgumentNotValidException ex){
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(

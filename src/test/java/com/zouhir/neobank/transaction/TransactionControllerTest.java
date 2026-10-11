@@ -1,0 +1,109 @@
+package com.zouhir.neobank.transaction;
+
+import com.zouhir.neobank.common.exceptions.AccountNotFoundException;
+import com.zouhir.neobank.common.exceptions.InsufficientBalanceException;
+import com.zouhir.neobank.user.User;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import tools.jackson.databind.json.JsonMapper;
+import com.zouhir.neobank.account.AccountService;
+import com.zouhir.neobank.security.JwtService;
+import com.zouhir.neobank.transaction.dto.TransactionRequestDto;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(controllers = TransactionController.class)
+@DisplayName("Transaction Controller Tests")
+class TransactionControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private JsonMapper jsonMapper;
+
+    @MockitoBean
+    private TransactionService transactionService;
+
+    @MockitoBean
+    private AccountService accountService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    private UUID fromId;
+    private UUID toId;
+
+    private TransactionRequestDto request;
+    private User principal;
+    private Authentication auth;
+
+    @BeforeEach
+    public void setUp(){
+        fromId = UUID.randomUUID();
+        toId = UUID.randomUUID();
+
+        principal = User
+                .builder()
+                .id(UUID.randomUUID())
+                .email("zouhir@example.com")
+                .passwordHash("pwd")
+                .build();
+
+        auth = new UsernamePasswordAuthenticationToken(
+                principal,
+                null,
+                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+
+    }
+
+    @Test
+    @DisplayName("Should successfully transfer funds and return 200 OK when balance is sufficient")
+    public void should_transfer_funds_when_balance_is_sufficient() throws Exception{
+        //GIVEN
+
+        request = TransactionRequestDto
+                .builder()
+                .fromAccountId(fromId)
+                .toAccountId(toId)
+                .amount(new BigDecimal("100"))
+                .reference("reference")
+                .build();
+
+        String jsonRequest = jsonMapper.writeValueAsString(request);
+
+        given(accountService.verifyAccountOwnership(fromId, principal.getId()))
+                .willReturn(true);
+
+        //WHEN and THEN
+        mockMvc.perform(post("/api/v1/transaction/transfer")
+                .with(authentication(auth))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequest)
+                )
+                .andExpect(status().isOk());
+    }
+
+
+
+}
