@@ -135,5 +135,34 @@ class TransactionControllerTest {
 
     }
 
+    @Test
+    @DisplayName("Should return 400 Bad Request when the transfer amount is null")
+    public void should_fail_transfer_when_amount_is_null() throws Exception{
+        //GIVEN
+
+        request = TransactionRequestDto
+                .builder()
+                .fromAccountId(fromId)
+                .toAccountId(toId)
+                .amount(null)
+                .reference("reference")
+                .build();
+
+
+        String jsonRequest = jsonMapper.writeValueAsString(request);
+
+        given(accountService.verifyAccountOwnership(fromId, principal.getId()))
+                .willReturn(true);
+
+        //WHEN and THEN
+        mockMvc.perform(post("/api/v1/transaction/transfer")
+                        .with(authentication(auth))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest)
+                )
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
