@@ -164,5 +164,39 @@ class TransactionControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("should return RFC 7807 format when account not found")
+    public void should_return_rfc7807_when_account_not_found() throws Exception{
+        //GIVEN
+        request = TransactionRequestDto
+                .builder()
+                .fromAccountId(fromId)
+                .toAccountId(toId)
+                .amount(new BigDecimal("100"))
+                .reference("reference")
+                .build();
+
+
+        given(transactionService.transfer(any(), any(), any(), any()))
+                .willThrow(new AccountNotFoundException("Error : The source account does not exist"));
+        String jsonRequest = jsonMapper.writeValueAsString(request);
+
+        given(accountService.verifyAccountOwnership(fromId, principal.getId()))
+                .willReturn(true);
+
+        //WHEN and THEN
+        mockMvc.perform(post("/api/v1/transaction/transfer")
+                        .with(authentication(auth))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest)
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").value("Error : The source account does not exist"))
+                .andExpect(jsonPath("$.title").value("Account Not Found"));
+
+
+    }
 
 }
