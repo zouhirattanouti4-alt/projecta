@@ -1,10 +1,8 @@
 package com.zouhir.neobank.transaction;
 
 import com.zouhir.neobank.common.exceptions.AccountNotFoundException;
-import com.zouhir.neobank.common.exceptions.InsufficientBalanceException;
 import com.zouhir.neobank.user.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -52,7 +50,6 @@ class TransactionControllerTest {
     private UUID fromId;
     private UUID toId;
 
-    private TransactionRequestDto request;
     private User principal;
     private Authentication auth;
 
@@ -81,7 +78,7 @@ class TransactionControllerTest {
     public void should_transfer_funds_when_balance_is_sufficient() throws Exception{
         //GIVEN
 
-        request = TransactionRequestDto
+        TransactionRequestDto request = TransactionRequestDto
                 .builder()
                 .fromAccountId(fromId)
                 .toAccountId(toId)
@@ -110,7 +107,7 @@ class TransactionControllerTest {
     public void should_fail_transfer_when_amount_is_negative() throws Exception{
         //GIVEN
 
-        request = TransactionRequestDto
+        TransactionRequestDto request = TransactionRequestDto
                 .builder()
                 .fromAccountId(fromId)
                 .toAccountId(toId)
@@ -140,7 +137,7 @@ class TransactionControllerTest {
     public void should_fail_transfer_when_amount_is_null() throws Exception{
         //GIVEN
 
-        request = TransactionRequestDto
+        TransactionRequestDto request = TransactionRequestDto
                 .builder()
                 .fromAccountId(fromId)
                 .toAccountId(toId)
@@ -168,7 +165,7 @@ class TransactionControllerTest {
     @DisplayName("should return RFC 7807 format when account not found")
     public void should_return_rfc7807_when_account_not_found() throws Exception{
         //GIVEN
-        request = TransactionRequestDto
+        TransactionRequestDto request = TransactionRequestDto
                 .builder()
                 .fromAccountId(fromId)
                 .toAccountId(toId)
