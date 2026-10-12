@@ -105,5 +105,32 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.balance").value(new BigDecimal("100")));
     }
 
+    @Test
+    @DisplayName("Should return 403 Forbidden when the authenticated user does not own the account")
+    public void should_return_forbidden_when_user_is_not_account_owner() throws Exception{
+        //GIVNE
+        UUID id = UUID.randomUUID();
+        Account account = Account
+                .builder()
+                .id(id)
+                .user(principal)
+                .balance(new BigDecimal("100"))
+                .build();
+
+        String jsonAccount = jsonMapper.writeValueAsString(account);
+
+        given(accountService.verifyAccountOwnership(any(), any()))
+                .willReturn(false);
+
+        //WHEN and THEN
+        mockMvc.perform(get("/api/v1/accounts/"+id+"/balance")
+                        .with(authentication(auth))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonAccount)
+                )
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
 
 }
