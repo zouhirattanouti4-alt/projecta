@@ -77,8 +77,8 @@ class AuthenticationControllerTest {
 
 
     @Test
-    @DisplayName("should successfully register and return 201 CREATED and JWT token when valid infos are valid")
-    public void should_register_when_valid_infos_are_valid() throws Exception{
+    @DisplayName("Should register user and return 201 Created with JWT token when request is valid")
+    public void should_RegisterUserAndReturnToken_When_RequestIsValid() throws Exception{
         //GIVEN
         AuthenticationResponseDto response = AuthenticationResponseDto
                 .builder()
@@ -116,8 +116,8 @@ class AuthenticationControllerTest {
     }
 
     @Test
-    @DisplayName("should reject registering user and return 400 BAD REQUEST when given email is not valid")
-    public void should_reject_registering_when_email_is_not_valid() throws Exception{
+    @DisplayName("Should return 400 Bad Request when registration email is missing or invalid")
+    public void should_ReturnBadRequest_When_EmailIsInvalid() throws Exception{
         //GIVEN
         RegisterRequestDto request = RegisterRequestDto
                 .builder()
@@ -146,8 +146,8 @@ class AuthenticationControllerTest {
     }
 
     @Test
-    @DisplayName("should reject registering user and return 400 BAD REQUEST when given password is not valid")
-    public void should_reject_registering_when_password_is_not_valid() throws Exception{
+    @DisplayName("Should return 400 Bad Request when registration password is missing")
+    public void should_ReturnBadRequest_When_PasswordIsMissing() throws Exception{
         //GIVEN
         RegisterRequestDto request = RegisterRequestDto
                 .builder()
