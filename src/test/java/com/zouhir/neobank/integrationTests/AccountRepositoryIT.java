@@ -80,4 +80,21 @@ public class AccountRepositoryIT {
         //Then
         assertTrue(exists);
     }
+
+    @Test
+    void shouldReturnFalseWhenAccountBelongsToDifferentUser(){
+        //GIVEN
+        User userA = createUser();
+        User savedUserA = em.persistAndFlush(userA);
+        User userB = createUser();
+        User savedUserB = em.persistAndFlush(userB);
+        Account accountA = createAccount(savedUserA, new BigDecimal("100"));
+        Account savedAccountA = em.persistAndFlush(accountA);
+
+        //WHEN
+        boolean exists = accountRepository.existsByIdAndUser_Id(savedAccountA.getId(), savedUserB.getId());
+
+        //THEN
+        assertFalse(exists);
+    }
 }
