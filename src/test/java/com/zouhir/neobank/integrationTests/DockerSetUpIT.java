@@ -11,7 +11,6 @@ class DockerSetupIT {
     void postgresContainerShouldStart() {
         try (PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:16")) {
             postgres.start();
-
             assertThat(postgres.isRunning()).isTrue();
             System.out.println("JDBC URL : " + postgres.getJdbcUrl());
         }
