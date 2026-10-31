@@ -64,4 +64,20 @@ public class AccountRepositoryIT {
         assertThat(fetchedAccount.getBalance()).isEqualByComparingTo(new BigDecimal("100"));
         assertEquals(0, fetchedAccount.getVersion());
     }
+
+    @Test
+    void shouldReturnTrueWhenAccountBelongsToUser(){
+        //GIVEN
+        User user = createUser();
+        User savedUser = em.persistAndFlush(user);
+        Account account = createAccount(savedUser, new BigDecimal("100"));
+        Account savedAccount = em.persistAndFlush(account);
+        em.clear();
+
+        //WHEN
+        boolean exists = accountRepository.existsByIdAndUser_Id(savedAccount.getId(), savedUser.getId());
+
+        //Then
+        assertTrue(exists);
+    }
 }
